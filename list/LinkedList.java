@@ -1,6 +1,7 @@
 package list;
 
 import exceptions.*;
+import graph.Vertex;
 
 // LinkedList personalizado para el Sistema de Gestión y Optimización de Inventarios en Almacenes.
 // Implementación de TDAList<T> con lista enlazada unidireccional sin usar Iterator.
@@ -17,11 +18,7 @@ public class LinkedList<T> implements TDAList<T> {
     }
 
     // * Añade un elemento al final de la lista.
-    public void add(T data) throws ItemDuplicated {
-        // Duplicado solo si lista no vacía
-        if (size > 0 && indexOf(data) >= 0) {
-            throw new ItemDuplicated("Elemento ya existe: " + data);
-        }
+    public void add(T data) {
         LinkedNode<T> newNode = new LinkedNode<>(data);
         if (head == null) {
             head = newNode;
@@ -40,10 +37,7 @@ public class LinkedList<T> implements TDAList<T> {
         if (index < 0 || index > size) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         }
-        // Duplicado solo si ya existe
-        if (size > 0 && indexOf(data) >= 0) {
-            throw new ItemDuplicated("Elemento ya existe: " + data);
-        }
+        
         LinkedNode<T> newNode = new LinkedNode<>(data);
         if (index == 0) {
             newNode.setNext(head);
@@ -131,7 +125,6 @@ public class LinkedList<T> implements TDAList<T> {
         return old;
     }
 
-
     // * Elimina el elemento en la posición indicada.
     public T remove(int index) throws IsEmpty, ItemNotFound {
         if (size == 0) {
@@ -195,5 +188,17 @@ public class LinkedList<T> implements TDAList<T> {
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    // MÉTODOS ADICIONALES
+
+    // * Elimina y devuelve el primer elemento de la lista.
+    public T removeFirst() throws IsEmpty, ItemNotFound {
+        return remove(0);
+    }
+
+    // * Añade un elemento al final de la lista (alias de add()).
+    public void addLast(T data) {
+        add(data);
     }
 }

@@ -7,17 +7,17 @@ import exceptions.*;
 // Permite recorrer elementos con bucles indexados convencional.
 
 public class ArrayList<T> implements TDAList<T> {
-	private Object[] elements;
-    private int size = 0;
-    private static final int DEFAULT_CAPACITY = 10;
+	private Object[] elements; //CA SE UARDAN TDOS LOS ELEMENTOS
+    private int size = 0; // ES EL TAMAÑO DE LA LISTA 
+    private static final int DEFAULT_CAPACITY = 10;// LA CAPACIDAD POR DEFECTO
 
     // * Construye una lista con capacidad inicial por defecto.
     public ArrayList() {
-        elements = new Object[DEFAULT_CAPACITY];
+        elements = new Object[DEFAULT_CAPACITY]; // CONSTRUYE LA LISTA
     }
 
     // * Añade un elemento al final de la lista.
-    public void add(T e) throws ItemDuplicated {
+    public void add(T e) throws ItemDuplicated {//AÑADE UN ELEMENTO AL FINAL DE LA LISTAA
         // ** Comprueba duplicado antes de agregar
         if (size > 0 && indexOf(e) >= 0) {
             throw new ItemDuplicated("Elemento ya existe: " + e);
@@ -29,7 +29,7 @@ public class ArrayList<T> implements TDAList<T> {
     // * Inserta un elemento en la posición indicada.
     public void add(int index, T e) throws ItemDuplicated, ItemNotFound {
         // Verifica índice válido
-        if (index < 0 || index > size) {
+        if (index < 0 || index > size) {// VERIFICA QUE LOS INDICES ESTAN EN LOS LIMERST
             throw new ItemNotFound("Índice inválido: " + index);
         }
         // Duplicado solo si lista no vacía
@@ -46,7 +46,7 @@ public class ArrayList<T> implements TDAList<T> {
     }
 
     // * Limpia la lista, eliminando todos los elementos.
-    public void clear() throws IsEmpty {
+    public void clear() throws IsEmpty { // ELIMINA TODA LA LSITA 
         if (size == 0) {
             throw new IsEmpty("La lista ya está vacía");
         }
@@ -57,7 +57,7 @@ public class ArrayList<T> implements TDAList<T> {
     }
 
     // * Devuelve el índice de la primera ocurrencia del elemento, o -1 si no existe.
-    public int indexOf(T e) {
+    public int indexOf(T e) { //MUESTRA LA PRIMERA OCURRENCIA DLE ELEENTO E
         for (int i = 0; i < size; i++) {
             if (elements[i].equals(e)) {
                 return i;
@@ -67,7 +67,7 @@ public class ArrayList<T> implements TDAList<T> {
     }
 
     // * Devuelve el índice de la última ocurrencia del elemento, o -1 si no existe.
-    public int lastIndexOf(T e) {
+    public int lastIndexOf(T e) {// MUETSRA LA ULTIMA OCURRENCIA DE ELEMENTO
         for (int i = size - 1; i >= 0; i--) {
             if (elements[i].equals(e)) {
                 return i;

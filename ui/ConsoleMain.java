@@ -16,6 +16,29 @@ public class ConsoleMain {
     public static void main(String[] args) throws ItemDuplicated, IsEmpty, ItemNotFound {
         InventorySystem system = new InventorySystem();
         Scanner scanner = new Scanner(System.in);
+
+        // Datos predefinidos para probar añadir ítems (Opción 1)
+        String[][] itemsPredefinidos = {
+            {"A100", "Martillo", "50", "AlmacenA-Pasillo1"},
+            {"B200", "Tornillos", "500", "AlmacenB-Pasillo3"},
+            {"C300", "Destornillador", "30", "AlmacenA-Pasillo2"},
+            {"D400", "Pintura Roja", "20", "AlmacenC-Pasillo1"}
+        };
+
+        // Añadir ítems predefinidos automáticamente
+        for (String[] item : itemsPredefinidos) {
+            try {
+                Item nuevoItem = new Item(item[0], item[1], Integer.parseInt(item[2]), item[3]);
+                system.addItem(nuevoItem);
+                System.out.println("Ítem añadido: " + item[0] + " - " + item[1]);
+            } catch (ItemDuplicated e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+
+
+
         while (true) {
             System.out.println("\n--- Menú Inventarios ---");
             System.out.println("1. Añadir ítem");

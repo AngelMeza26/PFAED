@@ -25,12 +25,12 @@ public class HashNode<K, V> {
     }
 
     /** @return la clave de este nodo */
-    public K getKey() {
+    public K getKey() {//RETORNA EL NODO
         return key;
     }
 
     /** @return el valor asociado a esta clave */
-    public V getValue() {
+    public V getValue() {//RETORNA NUESTRO VALOR
         return value;
     }
 
@@ -39,12 +39,12 @@ public class HashNode<K, V> {
      *
      * @param value nuevo valor (puede ser null)
      */
-    public void setValue(V value) {
+    public void setValue(V value) {// ASIGNA UN NUEVO VALO DEL KEY AL ORDEN 
         this.value = value;
     }
 
     /** @return el siguiente nodo en la cadena o null */
-    public HashNode<K, V> getNext() {
+    public HashNode<K, V> getNext() { //RETORNA EL SIGUUEITE NODO
         return next;
     }
 
@@ -53,7 +53,7 @@ public class HashNode<K, V> {
      *
      * @param next nodo siguiente
      */
-    public void setNext(HashNode<K, V> next) {
+    public void setNext(HashNode<K, V> next) {// PONDE EL NODO CON E SIGUIENTE EN LA TABLA HABLAS CUBETA
         this.next = next;
     }
 

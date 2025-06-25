@@ -8,84 +8,94 @@ import list.LinkedList;
 import graph.Vertex;
 import graph.Edge;
 
-/**
- * Grafo genérico ponderado para el Sistema de Gestión y Optimización de Inventarios en Almacenes.
- * Incluye rutas óptimas (Dijkstra), BFS, DFS, detección de ciclos, componentes conexas y zonas aisladas.
- * @param <E> tipo de datos de los vértices (Comparable)
- */
+//Grafo genérico ponderado para el Sistema de Gestión y Optimización de Inventarios en Almacenes.
+// Incluye rutas óptimas (Dijkstra), BFS, DFS, detección de ciclos, componentes conexas y zonas aisladas.
+ // @param <E> tipo de datos de los vértices (Comparable)
+
+//declaramos
 public class GraphLink<E extends Comparable<E>> {
-    private final LinkedList<Vertex<E>> vertices;
+    private final LinkedList<Vertex<E>> vertices;//lista enlaz de vertices
 
     public GraphLink() {
         vertices = new LinkedList<>();
     }
-
+//AÑADIMOS UN VERTICE A LA LISTA
     public void addVertex(E data) throws ItemDuplicated {
-        Vertex<E> v = new Vertex<>(data);
-        if (vertices.indexOf(v) >= 0) {
+        Vertex<E> v = new Vertex<>(data);//inicializamos una lista vacia donde aladiremos vertices
+        if (vertices.indexOf(v) >= 0) {//el vertice ya esta en la lista?
             throw new ItemDuplicated("Vértice ya existe: " + data);
         }
-        vertices.add(v);
+        vertices.add(v);//añade
     }
-
+//ELIMINAMOOOOS VERTICES
     public void removeVertex(E data) throws IsEmpty, ItemNotFound {
-        if (vertices.isEmpty()) throw new IsEmpty("El grafo está vacío");
-        Vertex<E> v = findVertex(data);
+        if (vertices.isEmpty()) throw new IsEmpty("El grafo está vacío");//LISTA VACIA??
+        Vertex<E> v = findVertex(data);//si no lo encuntra, itemnotfound, peor sisi devuelve v
         for (int i = 0; i < vertices.size(); i++) {
-            vertices.get(i).removeEdgeTo(v);
+            vertices.get(i).removeEdgeTo(v);//eliminamos aristas
         }
         vertices.remove(v);
     }
-
+//AÑDE UNA ARISTA
+    //NECESITAMOS ORIGEN/ DESTINO Y PESO
     public void addEdge(E src, E dest, double weight) throws ItemNotFound, ItemDuplicated, IsEmpty {
         Vertex<E> vSrc = findVertex(src);
         Vertex<E> vDest = findVertex(dest);
-        Edge<E> edge = new Edge<>(vDest, weight);
+        Edge<E> edge = new Edge<>(vDest, weight);//CREA objeto edge con el destino y peso
         vSrc.addEdge(edge);
     }
+//ELIMINAMOS ARISRA
 
+    //lo miso que el anterior pero sin peso
     public void removeEdge(E src, E dest) throws ItemNotFound, IsEmpty {
         Vertex<E> vSrc = findVertex(src);
         Vertex<E> vDest = findVertex(dest);
-        vSrc.removeEdgeTo(vDest);
+        vSrc.removeEdgeTo(vDest);//Pide al vértice origen que quite de su lista de adyacencia cualquier arista que apunte a vDest.
     }
 
+    //DIJKSTRA, ruta mas corta 
     public LinkedList<E> shortestPath(E origin, E destination) throws ItemNotFound, IsEmpty, ItemDuplicated {
-        if (vertices.isEmpty()) throw new IsEmpty("El grafo está vacío");
+        if (vertices.isEmpty()) throw new IsEmpty("El grafo está vacío"); //esta vacio?
         Vertex<E> src = findVertex(origin);
         Vertex<E> dst = findVertex(destination);
-        int n = vertices.size();
-        double[] dist = new double[n];
-        Vertex<E>[] prev = new Vertex[n];
-        boolean[] visited = new boolean[n];
+        int n = vertices.size();//n sera el total de vertices en el grafo
+        double[] dist = new double[n];// la distancia mínima que hemos hallado hasta él desde src
+        Vertex<E>[] prev = new Vertex[n];//nuestras migajas de risitos de oro
+        boolean[] visited = new boolean[n];//marco lo que ya recorrimos
 
+        //comenzamos la ruta
         for (int i = 0; i < n; i++) {
-            dist[i] = vertices.get(i).equals(src) ? 0.0 : Double.POSITIVE_INFINITY;
+            dist[i] = vertices.get(i).equals(src) ? 0.0 : Double.POSITIVE_INFINITY;//inicializamos la distacia en 0
             prev[i] = null;
             visited[i] = false;
         }
 
         for (int k = 0; k < n; k++) {
-            int u = -1;
-            double min = Double.POSITIVE_INFINITY;
+            int u = -1;//guarda la ruta que aun no iniciamos 
+            double min = Double.POSITIVE_INFINITY;//Esto te permite llevar la “distancia mínima encontrada hasta ahora” de forma segura.
             for (int i = 0; i < n; i++) {
                 if (!visited[i] && dist[i] < min) {
                     min = dist[i];
                     u = i;
                 }
             }
-            if (u < 0) break;
+            if (u < 0) break;//si no hay mas vertices procesados, salimos
+            //marca u como procesado
             visited[u] = true;
             Vertex<E> vU = vertices.get(u);
-            if (vU.equals(dst)) break;
+            if (vU.equals(dst)) break;// si el valor de u es el destio terminamos anticipadamente
 
-            LinkedList<Edge<E>> adj = vU.getAdjList();
+            LinkedList<Edge<E>> adj = vU.getAdjList();//obtiene las lista de atista de vu
+            //recorremos
             for (int j = 0; j < adj.size(); j++) {
                 Edge<E> e = adj.get(j);
                 Vertex<E> vV = e.getDestination();
                 int vIdx = vertices.indexOf(vV);
+                //Si por alguna razón no encontramos el índice, lo saltamos
                 if (vIdx < 0) continue;
+                //Calcular nueva distancia alternativa
                 double alt = dist[u] + e.getWeight();
+                //Si este camino mejora la distancia conocida, actualizar
                 if (alt < dist[vIdx]) {
                     dist[vIdx] = alt;
                     prev[vIdx] = vU;
@@ -93,24 +103,25 @@ public class GraphLink<E extends Comparable<E>> {
             }
         }
 
-        LinkedList<E> path = new LinkedList<>();
-        Vertex<E> step = dst;
+        LinkedList<E> path = new LinkedList<>();//nuestra mochila que guarda los datos E desde origen hasta destino
+        Vertex<E> step = dst;//corredor de vertices
         while (step != null) {
-            path.add(0, step.getData());
-            int idx = vertices.indexOf(step);
-            step = (idx >= 0) ? prev[idx] : null;
+            path.add(0, step.getData());//Insertar el dato al principio de la lista
+            int idx = vertices.indexOf(step);//Buscar el índice del vértice actual
+            step = (idx >= 0) ? prev[idx] : null;//actualiza 
         }
-        return path;
+        return path;//devuelve el camino
     }
-
+/////////////////////////////////////////////////////////////
+    //encontramos el verticeeeeee 
     private Vertex<E> findVertex(E data) throws ItemNotFound, IsEmpty {
         for (int i = 0; i < vertices.size(); i++) {
-            Vertex<E> v = vertices.get(i);
+            Vertex<E> v = vertices.get(i);//asuminmos el valor del corredor con el que visita
             if (v.getData().equals(data)) return v;
         }
         throw new ItemNotFound("Vértice no encontrado: " + data);
     }
-
+///////////////////////////
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -118,12 +129,14 @@ public class GraphLink<E extends Comparable<E>> {
             try {
                 sb.append(vertices.get(i).toString()).append("\n");
             } catch (IsEmpty | ItemNotFound e) {
-                e.printStackTrace();
+                e.printStackTrace();//imprime el error en consola pero no lo abortaea
             }
         }
-        return sb.toString();
+        return sb.toString();//retorna el string builder
     }
-
+////////////////////////////////////////////////////////////////
+    //BFS
+    
     public LinkedList<E> bfs(E start) throws ItemNotFound, IsEmpty {
         LinkedList<E> result = new LinkedList<>();
         LinkedList<Vertex<E>> queue = new LinkedList<>();

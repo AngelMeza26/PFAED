@@ -13,67 +13,63 @@ import exceptions.ItemNotFound;
  */
 public class HashTable<K, V> {
     private static final int DEFAULT_CAPACITY = 11;
-    private static final double DEFAULT_LOAD_FACTOR = 0.75;
+    private static final double DEFAULT_LOAD_FACTOR = 0.75;//capacidad de carga de %75
 
-    private HashNode<K, V>[] table;
+    private HashNode<K, V>[] table;//cada posicion es la posicion es la cabeza de lislaa
     private int capacity;
     private int size;
 
-    /**
-     * Construye una HashTable con capacidad inicial por defecto.
-     */
+    //Construimos una HashTable con capacidad inicial por defecto.
+    
     @SuppressWarnings("unchecked")
     public HashTable() {
         this.capacity = DEFAULT_CAPACITY;
         this.table = (HashNode<K, V>[]) new HashNode[capacity];
-        this.size = 0;
+        this.size = 0;//estara vacia!
     }
 
-    /**
-     * Función hash basada en hashCode(), acotada por la capacidad.
-     */
+    // Función HASH basada en hashCode(), acotada por la capacidad (11)
+    
     private int hash(K key) {
         return (key == null ? 0 : Math.abs(key.hashCode())) % capacity;
     }
 
-    /**
-     * Inserta un par (key,value). Lanza ItemDuplicated si la clave ya existe.
-     */
+    // Inserta un par (key,value). Lanza ItemDuplicated si la clave ya existe.
+     
     public void put(K key, V value) throws ItemDuplicated {
-        int idx = hash(key);
-        HashNode<K, V> node = table[idx];
+        int idx = hash(key);//OBTENEMOS UN ENTERO DONNDE IDX SEÑALARA EN QUE posicipon se almacenara  el key y el value
+        HashNode<K, V> node = table[idx];//empieza al inicio de la lista 
         while (node != null) {
-            if ((key == null && node.getKey() == null) || (key != null && key.equals(node.getKey()))) {
-                throw new ItemDuplicated("Clave duplicada: " + key);
+            if ((key == null && node.getKey() == null) || (key != null && key.equals(node.getKey()))) {//verificamos que no voten null
+                throw new ItemDuplicated("Clave duplicada: " + key);//si conincide llama itemduplicate, diciendo que ya existe en la tbla
             }
             node = node.getNext();
         }
-        HashNode<K, V> newNode = new HashNode<>(key, value);
-        newNode.setNext(table[idx]);
-        table[idx] = newNode;
+        HashNode<K, V> newNode = new HashNode<>(key, value);//creamos un nodohash
+        newNode.setNext(table[idx]);//al inicio esta el hash node
+        table[idx] = newNode;//actualiza, el noco nuevo estara en la cabeza
         size++;
-        if ((double) size / capacity >= DEFAULT_LOAD_FACTOR) {
+        if ((double) size / capacity >= DEFAULT_LOAD_FACTOR) {//SI SUPERA EL %75 REHASHEA
             rehash();
         }
     }
 
-    /**
-     * Obtiene el valor asociado a la clave. Lanza ItemNotFound si no existe.
-     */
+    // Obtiene el valor asociado a la clave. Lanza ItemNotFound si no existe.
+    //BUSCAREMOS POR MEDIO DE LA LCAVE
     public V get(K key) throws ItemNotFound {
         int idx = hash(key);
-        HashNode<K, V> node = table[idx];
+        HashNode<K, V> node = table[idx];//CABEZA DE LA LISTA ENLAZADA
         while (node != null) {
+            //si ambas claves son null son iguales            si qui no es null llama a ...
             if ((key == null && node.getKey() == null) || (key != null && key.equals(node.getKey()))) {
                 return node.getValue();
             }
-            node = node.getNext();
+            node = node.getNext();//pasa al siguiente nodo
         }
         throw new ItemNotFound("Clave no encontrada: " + key);
     }
 
-    /**
-     * Remueve el par con la clave dada y retorna su valor. Lanza ItemNotFound si no existe.
+    // Remueve el par con la clave dada y retorna su valor. Lanza ItemNotFound si no existe.
      */
     public V remove(K key) throws ItemNotFound {
         int idx = hash(key);

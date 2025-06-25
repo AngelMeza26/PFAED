@@ -70,14 +70,16 @@ public class HashTable<K, V> {
     }
 
     // Remueve el par con la clave dada y retorna su valor. Lanza ItemNotFound si no existe.
-     */
+    
     public V remove(K key) throws ItemNotFound {
         int idx = hash(key);
-        HashNode<K, V> node = table[idx];
-        HashNode<K, V> prev = null;
+        HashNode<K, V> node = table[idx];//NODE VA A RECORRER LA LLISLA ENLAZADA 
+        HashNode<K, V> prev = null;//prev queda apuntando al nodo anterior a node (inicialmente null).
         while (node != null) {
+            //SI LO QUE BUSCO ES igual al que esta almacenado es null son iguales
+            //verificmos que nuestra key no sea null para no provacar key.equals(node.getKey())
             if ((key == null && node.getKey() == null) || (key != null && key.equals(node.getKey()))) {
-                V val = node.getValue();
+                V val = node.getValue(); //antes de extraerlo de HT extraemos su valor
                 if (prev == null) {
                     table[idx] = node.getNext();
                 } else {
@@ -92,9 +94,8 @@ public class HashTable<K, V> {
         throw new ItemNotFound("Clave no encontrada: " + key);
     }
 
-    /**
-     * Verifica si existe la clave.
-     */
+    // Verifica si existe la clave.
+
     public boolean containsKey(K key) {
         try {
             get(key);
@@ -123,9 +124,9 @@ public class HashTable<K, V> {
         this.size = 0;
     }
 
-    /**
-     * Duplica la capacidad y reubica todos los pares.
-     */
+    // Duplica la capacidad y reubica todos los pares.
+    //rehasheo AL %75
+    
     @SuppressWarnings("unchecked")
     private void rehash() {
         HashNode<K, V>[] oldTable = table;

@@ -120,45 +120,47 @@ public class BPlusTree<T extends Comparable<T>> {
         // Encuentra el padre y la posición adecuada
         InternalNode parent = findParent(root, left);
         int pos = 0;
+        //BUSCAMOS LA POSICION DEL NUEVO PADRE
         while (pos < parent.keys.size() && key.compareTo(parent.keys.get(pos)) > 0) {
             pos++;
         }
         parent.keys.add(pos, key);
         parent.children.add(pos + 1, right);
-        // Si se sobrepasa la capacidad, se divide el nodo interno
+        // Si se sobrepasa la capacidad, se divide el nodo interno 
         if (parent.children.size() > order) {
             splitInternal(parent);
         }
     }
 
-    /**
-     * Encuentra el nodo padre de un hijo dado (usado en inserción)
-     */
+    // Encuentra el nodo padre de un hijo dado (usado en inserción)
+     
     private InternalNode findParent(Node cur, Node child) throws IsEmpty, ItemNotFound {
-        if (!cur.isLeaf()) {
+        if (!cur.isLeaf()) {//verificamos que cur no sea hoja o no nos sirve jaja
             InternalNode in = (InternalNode) cur;
-            for (int i = 0; i < in.children.size(); i++) {
+            for (int i = 0; i < in.children.size(); i++) {//bucamos el node hijoo, va por las ramas (hijo interno)
                 if (in.children.get(i) == child) return in;
             }
-            for (int i = 0; i < in.children.size(); i++) {
+            
+            for (int i = 0; i < in.children.size(); i++) {//buscamos en la hojas
                 InternalNode p = findParent(in.children.get(i), child);
-                if (p != null) return p;
+                if (p != null) return p; //Si la llamada interna devolvió un padre, lo retorna
             }
         }
         return null;
     }
 
-    /**
-     * Divide un nodo interno que ha superado su capacidad
-     */
+    // Divide un nodo interno que ha superado su capacidad
+     
     private void splitInternal(InternalNode node) throws ItemDuplicated, IsEmpty, ItemNotFound {
         int mid = order / 2;
         T upKey = node.keys.get(mid); // Clave que se promoverá al padre
+        //creamos el NUEVO hermno derecho que la mitad derecha
         InternalNode sibling = new InternalNode();
-        // Mueve claves y punteros hijos al nuevo nodo
+        // Mueve claves hijos al nuevo nodo
         for (int i = mid + 1; i < node.keys.size(); i++) {
             sibling.keys.add(node.keys.get(i));
         }
+        // Mueve los punteros hijos al nuevo nodo
         for (int i = mid + 1; i < node.children.size(); i++) {
             sibling.children.add(node.children.get(i));
         }
@@ -166,6 +168,7 @@ public class BPlusTree<T extends Comparable<T>> {
         while (node.keys.size() > mid) {
             node.keys.remove(mid);
         }
+        //  eliminamos los sobrantes al final     
         while (node.children.size() > mid + 1) {
             node.children.remove(node.children.size() - 1);
         }
@@ -173,9 +176,8 @@ public class BPlusTree<T extends Comparable<T>> {
         insertIntoParent(node, upKey, sibling);
     }
 
-    /**
-     * Verifica si la clave está presente en el árbol
-     */
+    // Verifica si la clave está presente en el árbol
+    
     public boolean contains(T key) throws IsEmpty, ItemNotFound {
         LeafNode leaf = findLeaf(root, key);
         for (int i = 0; i < leaf.keys.size(); i++) {
@@ -184,9 +186,8 @@ public class BPlusTree<T extends Comparable<T>> {
         return false;
     }
 
-    /**
-     * Elimina una clave del árbol sin rebalancear
-     */
+    // Elimina una clave del árbol SIN rebalancear
+     
     public void delete(T key) throws IsEmpty, ItemNotFound {
         LeafNode leaf = findLeaf(root, key);
         for (int i = 0; i < leaf.keys.size(); i++) {
@@ -198,29 +199,28 @@ public class BPlusTree<T extends Comparable<T>> {
         }
     }
 
-    /**
-     * Búsqueda por rango: devuelve todas las claves en el rango [from, to]
-     */
+    // Búsqueda por rango: devuelve todas las claves en el rango [from, to]
+     
     public ArrayList<T> rangeSearch(T from, T to) throws IsEmpty, ItemNotFound, ItemDuplicated {
-        ArrayList<T> res = new ArrayList<>();
-        LeafNode leaf = findLeaf(root, from);
+        ArrayList<T> res = new ArrayList<>();//es la lista vacia
+        LeafNode leaf = findLeaf(root, from);//ubicamoc la hoja para colocar el desde
         while (leaf != null) {
             for (int i = 0; i < leaf.keys.size(); i++) {
                 T k = leaf.keys.get(i);
-                if (k.compareTo(from) >= 0 && k.compareTo(to) <= 0) {
+                if (k.compareTo(from) >= 0 && k.compareTo(to) <= 0) {//Si k está dentro de [from, to], lo añade
                     res.add(k);
-                } else if (k.compareTo(to) > 0) {
+                } else if (k.compareTo(to) > 0) {//Si k ya supera 'to', el rango terminó: devolvemos 'res'
                     return res;
                 }
             }
-            leaf = leaf.next;
+            leaf = leaf.next;//sigueinte hojitaa jeje
         }
-        return res;
+        return res;//devolveos el recorrido
     }
 
-    /**
-     * Imprime la estructura del árbol (para debug o visualización)
-     */
+    // Imprime la estructura del árbol (para debug o visualización)
+    //DUBIJAMOS NUESTRO PODEROSO ARBOL BPLUSS TREE
+
     public void display() throws IsEmpty, ItemNotFound {
         displayNode(root, "");
     }

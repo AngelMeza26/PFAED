@@ -5,65 +5,61 @@ import exceptions.ItemDuplicated;
 import exceptions.IsEmpty;
 import exceptions.ItemNotFound;
 
-/**
- * B+ Tree genérico para el Sistema de Gestión y Optimización de Inventarios en Almacenes.
- * Cada nodo almacena hasta 'order' claves; las hojas están encadenadas para búsquedas por rango.
- *
- * @param <T> tipo de clave, debe implementar Comparable<T>
+// B+ Tree genérico para el Sistema de Gestión y Optimización de Inventarios en Almacenes.
+// Cada nodo almacena hasta 'order' claves; las hojas están encadenadas para búsquedas por rango.
+// @param <T> tipo de clave, debe implementar Comparable<T>
  */
 public class BPlusTree<T extends Comparable<T>> {
     private static final int DEFAULT_ORDER = 4; // Orden por defecto del árbol (máx claves por nodo)
     private final int order; // Orden definido por el usuario
     private Node root; // Raíz del árbol
 
-    /** Nodo base, clase abstracta común para hojas e internos */
+    // Nodo base, clase abstracta común para hojas e internos */
     abstract class Node {
         ArrayList<T> keys = new ArrayList<>(); // Claves contenidas en el nodo
         abstract boolean isLeaf(); // Método para saber si es hoja
     }
 
-    /** Nodo interno que almacena punteros a otros nodos (hijos) */
+    // Nodo interno que almacena punteros a otros nodos (hijos) */
     class InternalNode extends Node {
         ArrayList<Node> children = new ArrayList<>(); // Hijos de este nodo interno
         @Override boolean isLeaf() { return false; }
     }
 
-    /** Nodo hoja que almacena claves y valores, y apunta a la siguiente hoja (para búsquedas por rango) */
+    // Nodo hoja que almacena claves y valores, y apunta a la siguiente hoja (para búsquedas por rango)
     class LeafNode extends Node {
         ArrayList<T> values = new ArrayList<>(); // En este caso, los valores son iguales a las claves
         LeafNode next; // Apuntador a la siguiente hoja (lista enlazada)
         @Override boolean isLeaf() { return true; }
     }
 
-    /** Constructor por defecto con orden predefinido */
+    // Constructor por defecto con orden predefinido
     public BPlusTree() {
         this(DEFAULT_ORDER);
     }
 
-    /** Constructor que permite definir el orden del árbol */
+    // Constructor que permite definir el orden del árbol , orden 4
     public BPlusTree(int order) {
         if (order < 3) throw new RuntimeException("Order must be >= 3");
         this.order = order;
         this.root = new LeafNode(); // El árbol inicia con una hoja vacía como raíz
     }
 
-    /** Retorna la raíz para visualización externa */
+    // Retorna la raíz para visualización externa
     public Node getRoot() {
         return root;
     }
 
-    /**
-     * Inserta una clave al árbol.
-     * Si ya existe, lanza excepción.
-     */
+    // Inserta una clave al árbol.
+     // Si ya existe, lanza excepción.
+     
     public void insert(T key) throws ItemDuplicated, IsEmpty, ItemNotFound {
         LeafNode leaf = findLeaf(root, key); // Encuentra la hoja correspondiente
         int pos = 0;
         // Busca la posición de inserción ordenada
         while (pos < leaf.keys.size() && key.compareTo(leaf.keys.get(pos)) > 0) {
             pos++;
-        }
-        // Si ya existe la clave, lanza excepción
+        }        // Si ya existe la clave, lanza excepción
         if (pos < leaf.keys.size() && leaf.keys.get(pos).compareTo(key) == 0) {
             throw new ItemDuplicated("Clave duplicada: " + key);
         }
@@ -76,20 +72,19 @@ public class BPlusTree<T extends Comparable<T>> {
         }
     }
 
-    /**
-     * Encuentra la hoja que contendría la clave especificada
-     */
+    // Encuentra la hoja que contendría la clave especificada
+    
     private LeafNode findLeaf(Node node, T key) throws IsEmpty, ItemNotFound {
-        if (node.isLeaf()) return (LeafNode) node;
-        InternalNode in = (InternalNode) node;
+        if (node.isLeaf()) return (LeafNode) node;//si el nodo actual es hoja, ¡ya lo encontramos!
+        InternalNode in = (InternalNode) node;//sino es un nodo interno
         int i = 0;
-        while (i < in.keys.size() && key.compareTo(in.keys.get(i)) >= 0) i++;
+        while (i < in.keys.size() && key.compareTo(in.keys.get(i)) >= 0) i++;// decidir por cuál “puerta” (hijo) debes bajar
         return findLeaf(in.children.get(i), key);
     }
 
-    /**
-     * Divide una hoja en dos cuando se excede el número de claves
-     */
+    // Divide una hoja en dos cuando se excede el número de claves
+    //SPLITEAR
+    
     private void splitLeaf(LeafNode leaf) throws ItemDuplicated, IsEmpty, ItemNotFound {
         int mid = order / 2;
         LeafNode sibling = new LeafNode();
@@ -110,9 +105,8 @@ public class BPlusTree<T extends Comparable<T>> {
         insertIntoParent(leaf, sibling.keys.get(0), sibling);
     }
 
-    /**
-     * Inserta una clave y nuevo hijo en el nodo padre del nodo dividido
-     */
+    // Inserta una clave y nuevo hijo en el nodo padre del nodo dividido
+     
     private void insertIntoParent(Node left, T key, Node right) throws ItemDuplicated, IsEmpty, ItemNotFound {
         // Si se divide la raíz, se crea una nueva
         if (left == root) {

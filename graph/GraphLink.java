@@ -14,7 +14,7 @@ import graph.Edge;
 
 //declaramos
 public class GraphLink<E extends Comparable<E>> {
-    private final LinkedList<Vertex<E>> vertices;//lista enlaz de vertices
+    private final LinkedList<Vertex<E>> vertices;//lista enlazA de vertices
 
     public GraphLink() {
         vertices = new LinkedList<>();
@@ -63,7 +63,7 @@ public class GraphLink<E extends Comparable<E>> {
         Vertex<E>[] prev = new Vertex[n];//nuestras migajas de risitos de oro
         boolean[] visited = new boolean[n];//marco lo que ya recorrimos
 
-        //comenzamos la ruta
+        //comenzamos la ruta en 0
         for (int i = 0; i < n; i++) {
             dist[i] = vertices.get(i).equals(src) ? 0.0 : Double.POSITIVE_INFINITY;//inicializamos la distacia en 0
             prev[i] = null;
@@ -92,6 +92,7 @@ public class GraphLink<E extends Comparable<E>> {
                 Vertex<E> vV = e.getDestination();
                 int vIdx = vertices.indexOf(vV);
                 //Si por alguna razón no encontramos el índice, lo saltamos
+             //por siacaso jajajaja
                 if (vIdx < 0) continue;
                 //Calcular nueva distancia alternativa
                 double alt = dist[u] + e.getWeight();
@@ -172,7 +173,9 @@ public class GraphLink<E extends Comparable<E>> {
         dfsRecursive(startVertex, visited, result);
         return result;
     }
-
+////////////////////////////////////
+//DFS
+ 
     private void dfsRecursive(Vertex<E> v, boolean[] visited, LinkedList<E> result) {
         int idx = vertices.indexOf(v);
         if (visited[idx]) return;

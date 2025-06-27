@@ -7,8 +7,9 @@ import exceptions.ItemNotFound;
 
 // B+ Tree genérico para el Sistema de Gestión y Optimización de Inventarios en Almacenes.
 // Cada nodo almacena hasta 'order' claves; las hojas están encadenadas para búsquedas por rango.
-// @param <T> tipo de clave, debe implementar Comparable<T>
- */
+// @param <T> tipo de clave, debe implementar Comparable<T> */
+
+
 public class BPlusTree<T extends Comparable<T>> {
     private static final int DEFAULT_ORDER = 4; // Orden por defecto del árbol (máx claves por nodo)
     private final int order; // Orden definido por el usuario
@@ -141,7 +142,7 @@ public class BPlusTree<T extends Comparable<T>> {
                 if (in.children.get(i) == child) return in;
             }
             
-            for (int i = 0; i < in.children.size(); i++) {//buscamos en la hojas
+            for (int i = 0; i < in.children.size(); i++) {//buscamos mas abajo
                 InternalNode p = findParent(in.children.get(i), child);
                 if (p != null) return p; //Si la llamada interna devolvió un padre, lo retorna
             }
@@ -168,7 +169,7 @@ public class BPlusTree<T extends Comparable<T>> {
         while (node.keys.size() > mid) {
             node.keys.remove(mid);
         }
-        //  eliminamos los sobrantes al final     
+        //  eliminamos los sobrantes del nodo nuevo     
         while (node.children.size() > mid + 1) {
             node.children.remove(node.children.size() - 1);
         }
@@ -202,7 +203,7 @@ public class BPlusTree<T extends Comparable<T>> {
     // Búsqueda por rango: devuelve todas las claves en el rango [from, to]
      
     public ArrayList<T> rangeSearch(T from, T to) throws IsEmpty, ItemNotFound, ItemDuplicated {
-        ArrayList<T> res = new ArrayList<>();//es la lista vacia
+        ArrayList<T> res = new ArrayList<>();//mochila de rango
         LeafNode leaf = findLeaf(root, from);//ubicamoc la hoja para colocar el desde
         while (leaf != null) {
             for (int i = 0; i < leaf.keys.size(); i++) {

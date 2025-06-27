@@ -28,7 +28,7 @@ public class HashTable<K, V> {
         this.size = 0;//estara vacia!
     }
 
-    // Función HASH basada en hashCode(), acotada por la capacidad (11)
+    // Función HASH basada en hashCode(), acotada por la capacidad (11), HASHEAMOS
     
     private int hash(K key) {
         return (key == null ? 0 : Math.abs(key.hashCode())) % capacity;
@@ -39,8 +39,8 @@ public class HashTable<K, V> {
     public void put(K key, V value) throws ItemDuplicated {
         int idx = hash(key);//OBTENEMOS UN ENTERO DONNDE IDX SEÑALARA EN QUE posicipon se almacenara  el key y el value
         HashNode<K, V> node = table[idx];//empieza al inicio de la lista 
-        while (node != null) {
-            if ((key == null && node.getKey() == null) || (key != null && key.equals(node.getKey()))) {//verificamos que no voten null
+        while (node != null) {//verificamos que no voten null
+            if ((key == null && node.getKey() == null) || (key != null && key.equals(node.getKey()))) { //compara key con la clave de cada nodo (node.getKey()).
                 throw new ItemDuplicated("Clave duplicada: " + key);//si conincide llama itemduplicate, diciendo que ya existe en la tbla
             }
             node = node.getNext();
@@ -56,6 +56,7 @@ public class HashTable<K, V> {
 
     // Obtiene el valor asociado a la clave. Lanza ItemNotFound si no existe.
     //BUSCAREMOS POR MEDIO DE LA LCAVE
+    
     public V get(K key) throws ItemNotFound {
         int idx = hash(key);
         HashNode<K, V> node = table[idx];//CABEZA DE LA LISTA ENLAZADA
@@ -69,7 +70,9 @@ public class HashTable<K, V> {
         throw new ItemNotFound("Clave no encontrada: " + key);
     }
 
+    
     // Remueve el par con la clave dada y retorna su valor. Lanza ItemNotFound si no existe.
+    //ELIMINA
     
     public V remove(K key) throws ItemNotFound {
         int idx = hash(key);
@@ -77,7 +80,7 @@ public class HashTable<K, V> {
         HashNode<K, V> prev = null;//prev queda apuntando al nodo anterior a node (inicialmente null).
         while (node != null) {
             //SI LO QUE BUSCO ES igual al que esta almacenado es null son iguales
-            //verificmos que nuestra key no sea null para no provacar key.equals(node.getKey())
+            //Verifica si la clave del nodo actual (node.getKey()) es igual a la clave que queremos eliminar.
             if ((key == null && node.getKey() == null) || (key != null && key.equals(node.getKey()))) {
                 V val = node.getValue(); //antes de extraerlo de HT extraemos su valor
                 if (prev == null) {
@@ -94,7 +97,7 @@ public class HashTable<K, V> {
         throw new ItemNotFound("Clave no encontrada: " + key);
     }
 
-    // Verifica si existe la clave.
+    // Verifica si existe la clave!!!
 
     public boolean containsKey(K key) {
         try {
@@ -105,19 +108,18 @@ public class HashTable<K, V> {
         }
     }
 
-    /** @return número de pares almacenados */
+    // @return número de pares almacenados 
     public int size() {
         return size;
     }
 
-    /** @return true si la tabla está vacía */
+    // @return true si la tabla está vacía */
     public boolean isEmpty() {
         return size == 0;
     }
 
-    /**
-     * Limpia la tabla, eliminando todos los pares.
-     */
+    // Limpia la tabla, eliminando todos los pares.
+     
     @SuppressWarnings("unchecked")
     public void clear() {
         this.table = (HashNode<K, V>[]) new HashNode[capacity];
@@ -132,7 +134,7 @@ public class HashTable<K, V> {
         HashNode<K, V>[] oldTable = table;
         int oldCap = capacity;
         capacity *= 2;
-        table = (HashNode<K, V>[]) new HashNode[capacity];
+        table = (HashNode<K, V>[]) new HashNode[capacity];//cream,os nueva tabla vacia
         size = 0;
         for (int i = 0; i < oldCap; i++) {
             HashNode<K, V> node = oldTable[i];

@@ -89,21 +89,29 @@ public class BPlusTree<T extends Comparable<T>> {
     private void splitLeaf(LeafNode leaf) throws ItemDuplicated, IsEmpty, ItemNotFound {
         int mid = order / 2;
         LeafNode sibling = new LeafNode();
-        // Mueve la mitad superior de las claves/valores al nuevo hermano
+        
+        // Mueve la mitad superior al hermano (incluyendo la clave a promover)
         for (int i = mid; i < leaf.keys.size(); i++) {
             sibling.keys.add(leaf.keys.get(i));
             sibling.values.add(leaf.values.get(i));
         }
-        // Elimina esas claves de la hoja original
+        // Elimina las claves movidas de la hoja original
         while (leaf.keys.size() > mid) {
             leaf.keys.remove(mid);
             leaf.values.remove(mid);
         }
-        // Actualiza la lista enlazada de hojas
+        
+        // Actualiza el enlace entre hojas
         sibling.next = leaf.next;
         leaf.next = sibling;
-        // Inserta la clave promovida en el padre
-        insertIntoParent(leaf, sibling.keys.get(0), sibling);
+
+        // --- CORRECCIÓN AQUÍ --- //
+        // 1. Primero remueve y guarda la clave promovida (7)
+        T promotedKey = sibling.keys.remove(0);  // Elimina y obtiene el 7
+        sibling.values.remove(0);               // Elimina su valor asociado
+        
+        // 2. Luego promueve ESA clave (no sibling.keys.get(0))
+        insertIntoParent(leaf, promotedKey, sibling);  // Usa promotedKey, no sibling.keys.get(0)
     }
 
     // Inserta una clave y nuevo hijo en el nodo padre del nodo dividido

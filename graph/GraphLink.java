@@ -69,10 +69,11 @@ public class GraphLink<E extends Comparable<E>> {
             prev[i] = null;
             visited[i] = false;
         }
-
+        
         for (int k = 0; k < n; k++) {
             int u = -1;//guarda la ruta que aun no iniciamos 
             double min = Double.POSITIVE_INFINITY;//Esto te permite llevar la “distancia mínima encontrada hasta ahora” de forma segura.
+         //BUSCAA el vértice no visitado con menor distancia
             for (int i = 0; i < n; i++) {
                 if (!visited[i] && dist[i] < min) {
                     min = dist[i];
@@ -80,11 +81,13 @@ public class GraphLink<E extends Comparable<E>> {
                 }
             }
             if (u < 0) break;//si no hay mas vertices procesados, salimos
-            //marca u como procesado
+         
+            //Si llegamos al destino, terminamos antes:
             visited[u] = true;
-            Vertex<E> vU = vertices.get(u);
+            Vertex<E> vU = vertices.get(u);         
             if (vU.equals(dst)) break;// si el valor de u es el destio terminamos anticipadamente
 
+         //actualizmos las distancias
             LinkedList<Edge<E>> adj = vU.getAdjList();//obtiene las lista de atista de vu
             //recorremos
             for (int j = 0; j < adj.size(); j++) {
@@ -103,7 +106,7 @@ public class GraphLink<E extends Comparable<E>> {
                 }
             }
         }
-
+//Reconstrucción del camino
         LinkedList<E> path = new LinkedList<>();//nuestra mochila que guarda los datos E desde origen hasta destino
         Vertex<E> step = dst;//corredor de vertices
         while (step != null) {
@@ -139,9 +142,9 @@ public class GraphLink<E extends Comparable<E>> {
     //BFS
     
     public LinkedList<E> bfs(E start) throws ItemNotFound, IsEmpty {
-        LinkedList<E> result = new LinkedList<>();
-        LinkedList<Vertex<E>> queue = new LinkedList<>();
-        boolean[] visited = new boolean[vertices.size()];
+        LinkedList<E> result = new LinkedList<>();//almacena el recorrido final
+        LinkedList<Vertex<E>> queue = new LinkedList<>();//cola de vericews por visitar
+        boolean[] visited = new boolean[vertices.size()];//indica si ya se visitó el vértice en la posición i.
 
         Vertex<E> startVertex = findVertex(start);
         int idxStart = vertices.indexOf(startVertex);
@@ -150,13 +153,13 @@ public class GraphLink<E extends Comparable<E>> {
 
         while (!queue.isEmpty()) {
             Vertex<E> current = queue.get(0);
-            queue.remove(0);
-            result.add(current.getData());
-
+            queue.remove(0);//eliminamos de la cola
+            result.add(current.getData());//agregamos a la cola
+// Explora vecinos del nodo actual
             LinkedList<Edge<E>> adj = current.getAdjList();
-            for (int i = 0; i < adj.size(); i++) {
-                Vertex<E> neighbor = adj.get(i).getDestination();
-                int idx = vertices.indexOf(neighbor);
+            for (int i = 0; i < adj.size(); i++) {//bistamos a los vvecimnos
+                Vertex<E> neighbor = adj.get(i).getDestination();//Extraemos el vértice destino
+                int idx = vertices.indexOf(neighbor);//Buscamos el índice del neighbor
                 if (!visited[idx]) {
                     visited[idx] = true;
                     queue.add(neighbor);
@@ -166,6 +169,10 @@ public class GraphLink<E extends Comparable<E>> {
         return result;
     }
 
+ 
+ ////////////////////////////////////
+//DFS
+ 
     public LinkedList<E> dfs(E start) throws ItemNotFound, IsEmpty {
         LinkedList<E> result = new LinkedList<>();
         boolean[] visited = new boolean[vertices.size()];
@@ -173,8 +180,6 @@ public class GraphLink<E extends Comparable<E>> {
         dfsRecursive(startVertex, visited, result);
         return result;
     }
-////////////////////////////////////
-//DFS
  
     private void dfsRecursive(Vertex<E> v, boolean[] visited, LinkedList<E> result) {
         int idx = vertices.indexOf(v);
